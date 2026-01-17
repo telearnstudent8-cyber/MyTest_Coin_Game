@@ -1,0 +1,378 @@
+:root {
+    --primary: #3b82f6;
+    --primary-glow: rgba(59, 130, 246, 0.5);
+    --accent: #fbbf24;
+    --danger: #f43f5e;
+    --success: #10b981;
+    --bg-space: #020617;
+    --glass: rgba(15, 23, 42, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --text: #f8fafc;
+}
+
+* {
+    box-sizing: border-box;
+    user-select: none;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--bg-space);
+    font-family: 'Outfit', 'Noto Sans TC', sans-serif;
+    color: var(--text);
+}
+
+#game-app {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+    overflow: hidden;
+}
+
+/* 星空背景動畫 */
+.stars-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    background: transparent;
+}
+
+.star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.5;
+    animation: twinkle var(--duration) infinite ease-in-out;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+#game-container {
+    position: relative;
+    width: 800px;
+    height: 600px;
+    box-shadow: 0 0 100px rgba(0, 0, 0, 1), 0 0 20px var(--primary-glow);
+    border: 1px solid var(--glass-border);
+    background: #000;
+    z-index: 2;
+}
+
+#gameCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+#ui-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.overlay-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(12px);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 100;
+    pointer-events: auto;
+}
+
+.hidden {
+    opacity: 0;
+    pointer-events: none !important;
+    transform: scale(1.1);
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+/* 載入條 */
+.progress-bar {
+    width: 250px;
+    height: 6px;
+    background: var(--glass-border);
+    border-radius: 10px;
+    margin-top: 20px;
+    overflow: hidden;
+}
+
+#progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    box-shadow: 0 0 10px var(--primary);
+    transition: width 0.3s ease;
+}
+
+/* 角色選擇 */
+.section-title {
+    font-size: 2rem;
+    margin-bottom: 40px;
+    text-shadow: 0 0 10px var(--primary-glow);
+}
+
+.character-options {
+    display: flex;
+    gap: 50px;
+    margin-bottom: 50px;
+}
+
+.char-option {
+    position: relative;
+    width: 200px;
+    height: 250px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.char-option:hover {
+    transform: translateY(-15px);
+    border-color: var(--primary);
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.char-option.selected {
+    border-color: var(--accent);
+    box-shadow: 0 0 30px rgba(251, 191, 36, 0.3);
+}
+
+.char-option img {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    z-index: 2;
+}
+
+.char-glow {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background: var(--primary);
+    filter: blur(40px);
+    opacity: 0.2;
+    z-index: 1;
+}
+
+.char-option.selected .char-glow {
+    background: var(--accent);
+    opacity: 0.4;
+}
+
+.premium-btn {
+    padding: 18px 50px;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: white;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3), 0 0 20px var(--primary-glow);
+    transition: all 0.3s ease;
+}
+
+.premium-btn:hover {
+    transform: scale(1.05) translateY(-2px);
+    box-shadow: 0 15px 30px rgba(59, 130, 246, 0.5);
+}
+
+/* 遊戲 HUD */
+#game-hud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+    z-index: 50;
+}
+
+.hud-panel {
+    background: var(--glass);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    padding: 15px 20px;
+    border-radius: 15px;
+    pointer-events: auto;
+}
+
+.left { display: flex; flex-direction: column; gap: 10px; }
+.right { display: flex; flex-direction: column; gap: 10px; min-width: 160px;}
+
+.stat-group label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: #94a3b8;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.danger .stat-value { color: var(--danger); }
+.pulse { animation: pulse 1s infinite; }
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.skill-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+}
+
+.skill-indicator .icon { font-size: 1.2rem; }
+.shop-trigger {
+    margin-top: 5px;
+    padding-top: 5px;
+    border-top: 1px solid var(--glass-border);
+    cursor: pointer;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* 商店 */
+.shop-modal {
+    width: 500px;
+    background: var(--bg-space);
+    border: 2px solid var(--primary);
+    border-radius: 25px;
+    padding: 35px;
+    position: relative;
+    box-shadow: 0 0 50px rgba(0,0,0,1), 0 0 30px var(--primary-glow);
+}
+
+.close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: var(--glass-border);
+    border: none;
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.shop-items {
+    margin-top: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.shop-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: var(--glass);
+    padding: 12px 20px;
+    border-radius: 15px;
+    border: 1px solid var(--glass-border);
+    transition: border-color 0.2s;
+}
+
+.shop-item:hover { border-color: var(--primary); }
+
+.item-visual { font-size: 1.8rem; }
+.item-info { flex: 1; display: flex; flex-direction: column; }
+.item-name { font-weight: 700; font-size: 1rem; }
+.item-desc { font-size: 0.75rem; color: #94a3b8; }
+.item-cost { font-size: 0.85rem; color: var(--accent); font-weight: 700; }
+
+.buy-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.buy-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 15px var(--primary-glow); }
+.buy-btn:disabled { background: #475569; opacity: 0.5; cursor: not-allowed; }
+
+/* 遊戲結束 */
+.game-over-title {
+    font-size: 4rem;
+    color: var(--danger);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.game-over-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 10%;
+    width: 80%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--danger), transparent);
+}
+
+.final-score { font-size: 1.8rem; margin-bottom: 30px; }
+.recovery-text { color: #64748b; font-size: 0.9rem; animation: blink 1s infinite; }
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}

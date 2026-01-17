@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>接金幣遊戲 - 宇宙巡航版</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <meta name="description" content="一款基於 Pygame 開發並移植至網頁的精緻接金幣遊戲，包含商店系統與多樣化敵人。">
+</head>
+<body>
+    <div id="game-app">
+        <!-- 背景裝飾 -->
+        <div class="stars-container"></div>
+        
+        <div id="game-container">
+            <canvas id="gameCanvas"></canvas>
+            
+            <div id="ui-overlay">
+                <!-- 載入畫面 -->
+                <div id="loading-screen" class="overlay-screen">
+                    <div class="loader-content">
+                        <h1 class="gradient-text">宇宙巡航機</h1>
+                        <p>正在初始化系統...</p>
+                        <div class="progress-bar"><div id="progress-fill"></div></div>
+                    </div>
+                </div>
+
+                <!-- 角色選擇畫面 -->
+                <div id="selector-screen" class="overlay-screen hidden">
+                    <h2 class="section-title">選擇你的太空員</h2>
+                    <div class="character-options">
+                        <div class="char-option" data-char="player">
+                            <div class="char-glow"></div>
+                            <img src="assets/player.png" alt="Player 1">
+                            <span>艾爾法 (Alpha)</span>
+                        </div>
+                        <div class="char-option" data-char="player2">
+                            <div class="char-glow"></div>
+                            <img src="assets/player2.png" alt="Player 2">
+                            <span>貝塔 (Beta)</span>
+                        </div>
+                    </div>
+                    <button id="start-btn" class="premium-btn">啟動引擎</button>
+                </div>
+
+                <!-- 遊戲 UI (HUD) -->
+                <div id="game-hud" class="hidden">
+                    <div class="hud-panel left">
+                        <div class="stat-group">
+                            <label>能量儲備 (Credits)</label>
+                            <div id="score-display" class="stat-value">0</div>
+                        </div>
+                        <div id="penalty-timer-container" class="stat-group danger hidden">
+                            <label>系統警告 (DANGER)</label>
+                            <div id="penalty-timer" class="stat-value pulse">0s</div>
+                        </div>
+                    </div>
+                    <div class="hud-panel right">
+                        <div class="skill-indicator" id="shield-indicator">
+                            <span class="icon">🛡️</span>
+                            <span id="shield-count">0</span>
+                            <small>(X)</small>
+                        </div>
+                        <div class="skill-indicator" id="block-indicator">
+                            <span class="icon">⚡</span>
+                            <span id="block-status">未解鎖</span>
+                            <small>(F)</small>
+                        </div>
+                        <div class="shop-trigger">
+                            <span class="icon">🛒</span>
+                            <small>按 S 開啟商店</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 商店畫面 -->
+                <div id="shop-screen" class="overlay-screen hidden">
+                    <div class="shop-modal">
+                        <button id="close-shop" class="close-btn">&times;</button>
+                        <h2 class="gradient-text">星際交易所</h2>
+                        <div class="shop-items">
+                            <div class="shop-item" data-type="speed">
+                                <div class="item-visual">🏃</div>
+                                <div class="item-info">
+                                    <span class="item-name">推進器升級 (Speed Up)</span>
+                                    <span class="item-desc">提升移動速度</span>
+                                    <span class="item-cost">500 能量</span>
+                                </div>
+                                <button class="buy-btn" data-cost="500">購買</button>
+                            </div>
+                            <div class="shop-item" data-type="jump">
+                                <div class="item-visual">🚀</div>
+                                <div class="item-info">
+                                    <span class="item-name">重力反轉 (High Jump)</span>
+                                    <span class="item-desc">提升跳躍高度</span>
+                                    <span class="item-cost">800 能量</span>
+                                </div>
+                                <button class="buy-btn" data-cost="800">購買</button>
+                            </div>
+                            <div class="shop-item" data-type="shield">
+                                <div class="item-visual">🛡️</div>
+                                <div class="item-info">
+                                    <span class="item-name">能量護盾 (Shield x1)</span>
+                                    <span class="item-desc">抵擋一次致命傷害</span>
+                                    <span class="item-cost">1000 能量</span>
+                                </div>
+                                <button class="buy-btn" data-cost="1000">購買</button>
+                            </div>
+                            <div class="shop-item" data-type="block_skill">
+                                <div class="item-visual">⚡</div>
+                                <div class="item-info">
+                                    <span class="item-name">戰術格擋 (BLOCK)</span>
+                                    <span class="item-desc">長按 F 進行防禦性移動</span>
+                                    <span class="item-cost">1200 能量</span>
+                                </div>
+                                <button class="buy-btn" data-cost="1200" id="buy-block">購買</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 遊戲結束畫面 -->
+                <div id="gameover-screen" class="overlay-screen hidden">
+                    <h1 class="game-over-title">系統崩潰</h1>
+                    <p class="final-score">最終積分: <span id="final-score-val">0</span></p>
+                    <div class="recovery-text">正在重啟系統核心...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 遊戲邏輯腳本 -->
+    <script src="js/ResourceManager.js"></script>
+    <script src="js/Components.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
